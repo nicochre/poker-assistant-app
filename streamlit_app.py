@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 from PIL import Image
-import io
 
 st.set_page_config(
             page_title="Poker Assistant", # => Quick reference - Streamlit
@@ -223,7 +222,7 @@ if len(st.session_state.prefloppredictions)>0 :
                 if len(preflop2_user_input)>1:
                     get_suggestions(preflop2_user_input,cards_list)
                 if preflop2_user_input.lower() in cards_list:
-                    st.session_state.preflop1 = preflop2_user_input
+                    st.session_state.preflop2 = preflop2_user_input
 
 if st.session_state.preflop1 !='' and st.session_state.preflop2 != '':
     st.markdown(f'#### Your preflop hand is *{st.session_state.preflop1}* and *{st.session_state.preflop2}*')
@@ -250,7 +249,7 @@ if st.session_state.preflopdecision == 'Continue':
         )
 
     # File uploader
-    uploaded_files_2 = st.file_uploader("Upload one or more images", type=["jpg", "jpeg", "png"], accept_multiple_files=True, key="upload2")
+    uploaded_files_2 = st.file_uploader("Upload 3 images", type=["jpg", "jpeg", "png"], accept_multiple_files=True, key="upload2")
     if uploaded_files_2:
         # Display uploaded images
         #st.image([Image.open(file) for file in uploaded_files], width=200)
@@ -359,7 +358,7 @@ if st.session_state.flopdecision == 'Continue':
         )
 
     # File uploader
-    uploaded_files_3 = st.file_uploader("Upload one or more images", type=["jpg", "jpeg", "png"], accept_multiple_files=True, key="upload3")
+    uploaded_files_3 = st.file_uploader("Upload one image", type=["jpg", "jpeg", "png"], accept_multiple_files=True, key="upload3")
     if uploaded_files_3:
         # Display uploaded images
         #st.image([Image.open(file) for file in uploaded_files], width=200)
@@ -420,7 +419,7 @@ if st.session_state.turndecision == 'Continue':
         )
 
     # File uploader
-    uploaded_files_4 = st.file_uploader("Upload one or more images", type=["jpg", "jpeg", "png"], accept_multiple_files=True, key="upload4")
+    uploaded_files_4 = st.file_uploader("Upload one image", type=["jpg", "jpeg", "png"], accept_multiple_files=True, key="upload4")
     if uploaded_files_4:
         # Display uploaded images
         #st.image([Image.open(file) for file in uploaded_files], width=200)
@@ -449,7 +448,7 @@ if st.session_state.turndecision == 'Continue':
                 st.session_state.river = results[0]
 
         with incor7:
-            button_incor7 = st.button('👎', key='turn_incorrect' )
+            button_incor7 = st.button('👎', key='river_incorrect' )
             if button_incor7:
                 st.session_state.river_cor_inc = 'incorrect'
         if st.session_state.river_cor_inc == 'incorrect':
@@ -464,9 +463,9 @@ if st.session_state.turndecision == 'Continue':
     contend, foldend = st.columns(2)
     with contend:
         won_button = st.button('🎉 I won', key='won_button')
-    if turn_continue_button:
+    if won_button:
         st.balloons()
     with foldend:
         lost_button = st.button('😭 I lost', key='turn_fold_button')
-    if turn_fold_button:
+    if lost_button:
         st.snow()
