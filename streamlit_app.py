@@ -99,6 +99,9 @@ if 'turn_cor_inc' not in st.session_state:
 if 'river_cor_inc' not in st.session_state:
     st.session_state.river_cor_inc = ''
 
+st.markdown('### Before we start I need some informations')
+st.session_state.nbofplayer = st.text_input("How many players are there?")
+st.session_state.position = st.text_input("What is your position?")
 
 # PREFLOP
 st.markdown(
@@ -108,7 +111,7 @@ st.markdown(
 # Define the FastAPI endpoint
 
 def get_prediction(files):
-    API_URL = "https://card-api-qscwgte56a-ew.a.run.app/predict"
+    API_URL = "https://final-docker-image-qscwgte56a-ew.a.run.app/predict"
     files_to_upload = [("files", (file.name, file.getvalue(), file.type)) for file in files]
     try:
         response = requests.post(API_URL, files=files_to_upload)
@@ -122,7 +125,7 @@ def get_prediction(files):
         return None
 
 def get_prediction_multiple(files):
-    API_URL = "https://card-api-qscwgte56a-ew.a.run.app/predict"
+    API_URL = "https://final-docker-image-qscwgte56a-ew.a.run.app/predict"
     files_to_upload = [("files", (file.name, file.getvalue(), file.type)) for file in files]
     try:
         response = requests.post(API_URL, files=files_to_upload)
@@ -136,13 +139,89 @@ def get_prediction_multiple(files):
         return None
 
 def get_preflop(num_players, position_int, first_card, second_card, raised=False ):
-    API_URL = "https://card-api-qscwgte56a-ew.a.run.app/preflop"
+    API_URL = "https://final-docker-image-qscwgte56a-ew.a.run.app/preflop"
     params = {
         'num_players' : num_players,
         'position_int': position_int,
         'raised': raised,
         'first_card': first_card,
         'second_card': second_card
+    }
+
+    try:
+        response = requests.get(API_URL, params)
+        response.raise_for_status()  # Raise an error for bad status codes
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        st.error(f"An error occurred: {e}")
+        return None
+    except requests.exceptions.JSONDecodeError as e:
+        st.error("Failed to decode JSON response.")
+        return None
+
+def get_flop(num_players, position_int, first_card, second_card, first_board_card, second_board_card, third_board_card, raised=False ):
+    API_URL = "https://final-docker-image-qscwgte56a-ew.a.run.app/flop"
+    params = {
+        'num_players' : num_players,
+        'position_int': position_int,
+        'first_card': first_card,
+        'second_card': second_card,
+        'first_board_card' : first_board_card,
+        'second_board_card': second_board_card,
+        'third_board_card': third_board_card,
+        'raised': raised
+    }
+
+    try:
+        response = requests.post(API_URL, params)
+        response.raise_for_status()  # Raise an error for bad status codes
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        st.error(f"An error occurred: {e}")
+        return None
+    except requests.exceptions.JSONDecodeError as e:
+        st.error("Failed to decode JSON response.")
+        return None
+
+
+def get_turn(num_players, position_int, first_card, second_card, first_board_card, second_board_card, third_board_card, fourth_board_card, raised=False ):
+    API_URL = "https://final-docker-image-qscwgte56a-ew.a.run.app/turn"
+    params = {
+        'num_players' : num_players,
+        'position_int': position_int,
+        'first_card': first_card,
+        'second_card': second_card,
+        'first_board_card' : first_board_card,
+        'second_board_card': second_board_card,
+        'third_board_card': third_board_card,
+        'fourth_board_card': fourth_board_card,
+        'raised': raised
+    }
+
+    try:
+        response = requests.post(API_URL, params)
+        response.raise_for_status()  # Raise an error for bad status codes
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        st.error(f"An error occurred: {e}")
+        return None
+    except requests.exceptions.JSONDecodeError as e:
+        st.error("Failed to decode JSON response.")
+        return None
+
+def get_river(num_players, position_int, first_card, second_card, first_board_card, second_board_card, third_board_card, fourth_board_card, fifth_board_card, raised=False ):
+    API_URL = "https://final-docker-image-qscwgte56a-ew.a.run.app/river"
+    params = {
+        'num_players' : num_players,
+        'position_int': position_int,
+        'raised': raised,
+        'first_card': first_card,
+        'second_card': second_card,
+        'first_board_card' : first_board_card,
+        'second_board_card': second_board_card,
+        'third_board_card': third_board_card,
+        'fourth_board_card': fourth_board_card,
+        'fifth_board_card': fifth_board_card
     }
 
     try:
@@ -178,7 +257,7 @@ if len(st.session_state.prefloppredictions)>0 :
 
     with col1:
             st.image(Image.open(uploaded_files_1[0]), width=200)
-            st.markdown(f"**Prediction:** {results[0]}")
+            st.markdown(f"**Prediction:** {results[0][0]}")
 
             # Add buttons for feedback
             cor1, incor1 = st.columns(2)
@@ -187,7 +266,7 @@ if len(st.session_state.prefloppredictions)>0 :
                 if button_cor1:
                     st.session_state.preflop1_cor_inc = 'correct'
                 if st.session_state.preflop1_cor_inc == 'correct':
-                    st.session_state.preflop1 = results[0]
+                    st.session_state.preflop1 = results[0][0]
 
             with incor1:
                 button_incor1 = st.button('👎', key='pred1_incorrect' )
@@ -201,7 +280,7 @@ if len(st.session_state.prefloppredictions)>0 :
                     st.session_state.preflop1 = preflop1_user_input
     with col2:
             st.image(Image.open(uploaded_files_1[1]), width=200)
-            st.markdown(f"**Prediction:** {results[1]}")
+            st.markdown(f"**Prediction:** {results[1][0]}")
 
             # Add buttons for feedback
             cor2, incor2 = st.columns(2)
@@ -211,7 +290,7 @@ if len(st.session_state.prefloppredictions)>0 :
                 if button_cor2:
                     st.session_state.preflop2_cor_inc = 'correct'
                 if st.session_state.preflop2_cor_inc == 'correct':
-                    st.session_state.preflop2 = results[1]
+                    st.session_state.preflop2 = results[1][0]
 
             with incor2:
                 button_incor2 = st.button('👎', key='pred2_incorrect')
@@ -226,6 +305,11 @@ if len(st.session_state.prefloppredictions)>0 :
 
 if st.session_state.preflop1 !='' and st.session_state.preflop2 != '':
     st.markdown(f'#### Your preflop hand is *{st.session_state.preflop1}* and *{st.session_state.preflop2}*')
+
+    if st.button('Get Recommendation', key='preflop_reco'):
+        with st.spinner("Calculating..."):
+                recommendation = get_preflop(st.session_state.nbofplayer, st.session_state.position, st.session_state.preflop1, st.session_state.preflop2, raised=False )['message']
+                st.write(recommendation)
 
 
     #Continue or Follow
@@ -269,14 +353,14 @@ if st.session_state.preflopdecision == 'Continue':
 
         with cola:
                 st.image(Image.open(uploaded_files_2[0]), width=200)
-                st.markdown(f"**Prediction:** {results[0]}")
+                st.markdown(f"**Prediction:** {results[0][0]}")
 
                 # Add buttons for feedback
                 cor3, incor3 = st.columns(2)
                 with cor3:
                     button_cor3 = st.button("👍", key='pred3_correct')
                     if button_cor3:
-                        st.session_state.flop1 = results[0]
+                        st.session_state.flop1 = results[0][0]
                         st.session_state.flop1_cor_inc = 'correct'
 
                 with incor3:
@@ -285,13 +369,13 @@ if st.session_state.preflopdecision == 'Continue':
                         st.session_state.flop1_cor_inc = 'incorrect'
                 if st.session_state.flop1_cor_inc == 'incorrect':
                     flop1_user_input = st.text_input('Enter the correct card',key='flop1_inc_text')
-                    if len(preflop1_user_input)>1:
+                    if len(flop1_user_input)>1:
                         get_suggestions(flop1_user_input,cards_list)
                     if flop1_user_input.lower() in cards_list:
                         st.session_state.flop1 = flop1_user_input
         with colb:
                 st.image(Image.open(uploaded_files_2[1]), width=200)
-                st.markdown(f"**Prediction:** {results[1]}")
+                st.markdown(f"**Prediction:** {results[1][0]}")
 
                 # Add buttons for feedback
                 cor4, incor4 = st.columns(2)
@@ -299,7 +383,7 @@ if st.session_state.preflopdecision == 'Continue':
                 with cor4:
                     button_cor4 = st.button("👍", key='pred4_correct')
                     if button_cor4:
-                        st.session_state.flop2 = results[1]
+                        st.session_state.flop2 = results[1][0]
                         st.session_state.flop2_cor_inc = 'correct'
                 with incor4:
                     button_incor4 = st.button('👎', key='pred4_incorrect')
@@ -313,7 +397,7 @@ if st.session_state.preflopdecision == 'Continue':
                         st.session_state.flop2 = flop2_user_input
         with colc:
                 st.image(Image.open(uploaded_files_2[2]), width=200)
-                st.markdown(f"**Prediction:** {results[2]}")
+                st.markdown(f"**Prediction:** {results[2][0]}")
 
                 # Add buttons for feedback
                 cor5, incor5 = st.columns(2)
@@ -321,7 +405,7 @@ if st.session_state.preflopdecision == 'Continue':
                 with cor5:
                     button_cor5 = st.button("👍", key='pred5_correct')
                     if button_cor5:
-                        st.session_state.flop3 = results[2]
+                        st.session_state.flop3 = results[2][0]
                         st.session_state.flop3_cor_inc = 'correct'
                 with incor5:
                     button_incor5 = st.button('👎', key='pred5_incorrect')
@@ -337,7 +421,10 @@ if st.session_state.preflopdecision == 'Continue':
 if st.session_state.flop1 !='' and st.session_state.flop2 != '' and st.session_state.flop3 != '' :
     st.markdown(f'#### Your preflop hand is *{st.session_state.preflop1}* and *{st.session_state.preflop2}*')
     st.markdown(f'#### The flop is *{st.session_state.flop1}*, *{st.session_state.flop2}* and *{st.session_state.flop3}*')
-
+    if st.button('Get Recommendation', key='flop_reco'):
+        with st.spinner("Calculating..."):
+                flop_reco = get_flop(st.session_state.nbofplayer, st.session_state.position, st.session_state.preflop1, st.session_state.preflop2,st.session_state.flop1,st.session_state.flop2,st.session_state.flop3, raised=False )
+                st.write(flop_reco)
 
     #Continue or Fold Flop
     # Create buttons with custom styles
@@ -375,7 +462,7 @@ if st.session_state.flopdecision == 'Continue':
         results = predictions.get("results", [])
 
         st.image(Image.open(uploaded_files_3[0]), width=200)
-        st.markdown(f"**Prediction:** {results[0]}")
+        st.markdown(f"**Prediction:** {results[0][0]}")
 
         # Add buttons for feedback
         cor6, incor6 = st.columns(2)
@@ -384,7 +471,7 @@ if st.session_state.flopdecision == 'Continue':
             if button_cor6:
                 st.session_state.turn_cor_inc = 'correct'
             if st.session_state.turn_cor_inc == 'correct':
-                st.session_state.turn = results[0]
+                st.session_state.turn = results[0][0]
 
         with incor6:
             button_incor6 = st.button('👎', key='turn_incorrect' )
@@ -396,6 +483,15 @@ if st.session_state.flopdecision == 'Continue':
                 get_suggestions(turn_user_input,cards_list)
             if turn_user_input.lower() in cards_list:
                 st.session_state.turn = turn_user_input
+
+if st.session_state.turn !='':
+    st.markdown(f'#### Your preflop hand is *{st.session_state.preflop1}* and *{st.session_state.preflop2}*')
+    st.markdown(f'#### The flop is *{st.session_state.flop1}*, *{st.session_state.flop2}* and *{st.session_state.flop3}*')
+    st.markdown(f'#### The turn is *{st.session_state.turn}*')
+    if st.button('Get Recommendation', key='turn_reco'):
+        with st.spinner("Calculating..."):
+                turn_reco = get_turn(st.session_state.nbofplayer, st.session_state.position, st.session_state.preflop1, st.session_state.preflop2,st.session_state.flop1,st.session_state.flop2,st.session_state.flop3,st.session_state.turn, raised=False )
+                st.write(turn_reco)
 
     #Continue or Follow
     # Create buttons with custom styles
@@ -436,7 +532,7 @@ if st.session_state.turndecision == 'Continue':
         results = predictions.get("results", [])
 
         st.image(Image.open(uploaded_files_4[0]), width=200)
-        st.markdown(f"**Prediction:** {results[0]}")
+        st.markdown(f"**Prediction:** {results[0][0]}")
 
         # Add buttons for feedback
         cor7, incor7 = st.columns(2)
@@ -445,7 +541,7 @@ if st.session_state.turndecision == 'Continue':
             if button_cor7:
                 st.session_state.river_cor_inc = 'correct'
             if st.session_state.river_cor_inc == 'correct':
-                st.session_state.river = results[0]
+                st.session_state.river = results[0][0]
 
         with incor7:
             button_incor7 = st.button('👎', key='river_incorrect' )
@@ -458,6 +554,16 @@ if st.session_state.turndecision == 'Continue':
             if river_user_input.lower() in cards_list:
                 st.session_state.river = river_user_input
 
+if st.session_state.turn !='':
+    st.markdown(f'#### Your preflop hand is *{st.session_state.preflop1}* and *{st.session_state.preflop2}*')
+    st.markdown(f'#### The flop is *{st.session_state.flop1}*, *{st.session_state.flop2}* and *{st.session_state.flop3}*')
+    st.markdown(f'#### The turn is *{st.session_state.turn}*')
+    st.markdown(f'#### The river is *{st.session_state.river}*')
+    if st.button('Get Recommendation', key='river_reco'):
+        with st.spinner("Calculating..."):
+                river_reco = get_river(st.session_state.nbofplayer, st.session_state.position, st.session_state.preflop1, st.session_state.preflop2,st.session_state.flop1,st.session_state.flop2,st.session_state.flop3,st.session_state.turn,st.session_state.river, raised=False )
+                st.write(river_reco)
+
     #Continue or Follow
     # Create buttons with custom styles
     contend, foldend = st.columns(2)
@@ -466,6 +572,6 @@ if st.session_state.turndecision == 'Continue':
     if won_button:
         st.balloons()
     with foldend:
-        lost_button = st.button('😭 I lost', key='turn_fold_button')
+        lost_button = st.button('😭 I lost', key='lost_button')
     if lost_button:
         st.snow()
