@@ -121,7 +121,7 @@ if 'river_recom' not in st.session_state:
 
 
 
-st.markdown('### Before we start I need some informations')
+st.markdown('### Before we start I need some information')
 st.session_state.nbofplayer = st.text_input("How many players are there?")
 st.session_state.position = st.text_input("What is your position?")
 
@@ -265,18 +265,17 @@ if len(st.session_state.prefloppredictions)>0 :
     feedback = {}
 
     col1, col2 = st.columns(2)
-
     with col1:
             st.image(Image.open(uploaded_files_1[0]), width=200)
             st.markdown(f"**Prediction:** {results[0][0]}")
 
             # Add buttons for feedback
             cor1, incor1 = st.columns(2)
+
             with cor1:
                 button_cor1 = st.button("👍", key='pred1_correct')
                 if button_cor1:
                     st.session_state.preflop1_cor_inc = 'correct'
-                if st.session_state.preflop1_cor_inc == 'correct':
                     st.session_state.preflop1 = results[0][0]
 
             with incor1:
@@ -288,7 +287,7 @@ if len(st.session_state.prefloppredictions)>0 :
                 if len(preflop1_user_input)>1:
                     get_suggestions(preflop1_user_input,cards_list)
                 if preflop1_user_input.lower() in cards_list:
-                    st.session_state.preflop1 = preflop1_user_input
+                    st.session_state.preflop1 = preflop1_user_input.lower()
     with col2:
             st.image(Image.open(uploaded_files_1[1]), width=200)
             st.markdown(f"**Prediction:** {results[1][0]}")
@@ -312,7 +311,7 @@ if len(st.session_state.prefloppredictions)>0 :
                 if len(preflop2_user_input)>1:
                     get_suggestions(preflop2_user_input,cards_list)
                 if preflop2_user_input.lower() in cards_list:
-                    st.session_state.preflop2 = preflop2_user_input
+                    st.session_state.preflop2 = preflop2_user_input.lower()
 
 if st.session_state.preflop1 !='' and st.session_state.preflop2 != '':
     st.markdown(f'#### Your preflop hand is *{st.session_state.preflop1}* and *{st.session_state.preflop2}*')
@@ -385,7 +384,7 @@ if st.session_state.preflopdecision == 'Continue':
                     if len(flop1_user_input)>1:
                         get_suggestions(flop1_user_input,cards_list)
                     if flop1_user_input.lower() in cards_list:
-                        st.session_state.flop1 = flop1_user_input
+                        st.session_state.flop1 = flop1_user_input.lower()
         with colb:
                 st.image(Image.open(uploaded_files_2[1]), width=200)
                 st.markdown(f"**Prediction:** {results[1][0]}")
@@ -407,7 +406,7 @@ if st.session_state.preflopdecision == 'Continue':
                     if len(flop2_user_input)>1:
                         get_suggestions(flop2_user_input,cards_list)
                     if flop2_user_input.lower() in cards_list:
-                        st.session_state.flop2 = flop2_user_input
+                        st.session_state.flop2 = flop2_user_input.lower()
         with colc:
                 st.image(Image.open(uploaded_files_2[2]), width=200)
                 st.markdown(f"**Prediction:** {results[2][0]}")
@@ -429,7 +428,7 @@ if st.session_state.preflopdecision == 'Continue':
                     if len(flop3_user_input)>1:
                         get_suggestions(flop3_user_input,cards_list)
                     if flop3_user_input.lower() in cards_list:
-                        st.session_state.flop3 = flop3_user_input
+                        st.session_state.flop3 = flop3_user_input.lower()
 
 if st.session_state.flop1 !='' and st.session_state.flop2 != '' and st.session_state.flop3 != '' :
     st.markdown(f'#### Your preflop hand is *{st.session_state.preflop1}* and *{st.session_state.preflop2}*')
@@ -439,7 +438,10 @@ if st.session_state.flop1 !='' and st.session_state.flop2 != '' and st.session_s
                 flop_reco = get_flop(st.session_state.nbofplayer, st.session_state.position, st.session_state.preflop1, st.session_state.preflop2,st.session_state.flop1,st.session_state.flop2,st.session_state.flop3, raised=False )['message']
         st.session_state.flop_recom = flop_reco
     if st.session_state.flop_recom:
-        st.write(st.session_state.flop_recom)
+        if len(st.session_state.flop_recom)>60:
+            st.write(st.session_state.flop_recom[:-15])
+        else:
+            st.write(st.session_state.flop_recom)
 
     #Continue or Fold Flop
     # Create buttons with custom styles
@@ -499,7 +501,7 @@ if st.session_state.flopdecision == 'Continue':
                 if len(turn_user_input)>1:
                     get_suggestions(turn_user_input,cards_list)
                 if turn_user_input.lower() in cards_list:
-                    st.session_state.turn = turn_user_input
+                    st.session_state.turn = turn_user_input.lower()
 
 if st.session_state.turn !='':
     st.markdown(f'#### Your preflop hand is *{st.session_state.preflop1}* and *{st.session_state.preflop2}*')
@@ -510,7 +512,10 @@ if st.session_state.turn !='':
                 turn_reco = get_turn(st.session_state.nbofplayer, st.session_state.position, st.session_state.preflop1, st.session_state.preflop2,st.session_state.flop1,st.session_state.flop2,st.session_state.flop3,st.session_state.turn, raised=False )['message']
         st.session_state.turn_recom = turn_reco
     if st.session_state.turn_recom:
-        st.write(st.session_state.turn_recom)
+        if len(st.session_state.turn_recom)>60:
+            st.write(st.session_state.turn_recom[:-15])
+        else:
+            st.write(st.session_state.turn_recom)
 
     #Continue or Follow
     # Create buttons with custom styles
@@ -573,7 +578,7 @@ if st.session_state.turndecision == 'Continue':
                 if len(river_user_input)>1:
                     get_suggestions(river_user_input,cards_list)
                 if river_user_input.lower() in cards_list:
-                    st.session_state.river = river_user_input
+                    st.session_state.river = river_user_input.lower()
 
     if st.session_state.river !='':
         st.markdown(f'#### Your preflop hand is *{st.session_state.preflop1}* and *{st.session_state.preflop2}*')
@@ -587,14 +592,14 @@ if st.session_state.turndecision == 'Continue':
     if st.session_state.river_recom:
         st.write(st.session_state.river_recom)
 
-        #Continue or Follow
-        # Create buttons with custom styles
-        contend, foldend = st.columns(2)
-        with contend:
-            won_button = st.button('🎉 I won', key='won_button')
-        if won_button:
-            st.balloons()
-        with foldend:
-            lost_button = st.button('😭 I lost', key='lost_button')
-        if lost_button:
-            st.snow()
+    #Continue or Follow
+    # Create buttons with custom styles
+    contend, foldend = st.columns(2)
+    with contend:
+        won_button = st.button('🎉 I won', key='won_button')
+    if won_button:
+        st.balloons()
+    with foldend:
+        lost_button = st.button('😭 I lost', key='lost_button')
+    if lost_button:
+        st.snow()
