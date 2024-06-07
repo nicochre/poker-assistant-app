@@ -3,10 +3,21 @@ import requests
 from PIL import Image
 
 st.set_page_config(
-            page_title="Poker Assistant", # => Quick reference - Streamlit
+            page_title="Poker Assistant", # => Poker Assistant - Streamlit
             page_icon="🐍",
             layout="centered", # wide
             initial_sidebar_state="auto") # collapsed
+
+# Display the image
+CSS = """
+
+.stApp {
+    background-color: #032e20;
+    #background-size: cover;
+}
+"""
+st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
+
 
 
 
@@ -135,19 +146,6 @@ def get_prediction(files):
         st.error("Failed to decode JSON response.")
         return None
 
-def get_prediction_multiple(files):
-    API_URL = "https://final-docker-image-qscwgte56a-ew.a.run.app/predict"
-    files_to_upload = [("files", (file.name, file.getvalue(), file.type)) for file in files]
-    try:
-        response = requests.post(API_URL, files=files_to_upload)
-        response.raise_for_status()  # Raise an error for bad status codes
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        st.error(f"An error occurred: {e}")
-        return None
-    except requests.exceptions.JSONDecodeError as e:
-        st.error("Failed to decode JSON response.")
-        return None
 
 def get_preflop(num_players, position_int, first_card, second_card, raised=False ):
     API_URL = "https://final-docker-image-qscwgte56a-ew.a.run.app/preflop"
