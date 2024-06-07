@@ -8,17 +8,6 @@ st.set_page_config(
             layout="centered", # wide
             initial_sidebar_state="auto") # collapsed
 
-# Display the image
-CSS = """
-
-.stApp {
-    background-color: #032e20;
-    #background-size: cover;
-}
-"""
-st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
-
-
 
 
 cards_list=[ 'ace of clubs',  'ace of diamonds',  'ace of hearts',  'ace of spades',
